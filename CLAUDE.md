@@ -22,6 +22,8 @@ av hver økt.
 ## Struktur
 - `src\` er originalen. CIRCUITPY er bare en kopi, så endringer gjøres i `src\`.
 - `src\lib\` har biblioteker fra bundle 10.x, 20261031.
+- `code.py` er bare en launcher (sone 0); programmet ligger i `app.py`. Kortet oppdaterer seg selv fra GitHub,
+  se `docs\PLAN_ota.md` og `tools\publish.py`. Ikke deploy en nyere versjon til kortet før OTA-test er ferdig.
 - `tools\deploy.ps1` kopierer til kortet og starter det på nytt. Auto-reload er av i `code.py`,
   så filer lagret rett på CIRCUITPY virker først etter omstart. Skriptet sletter ikke filer
   som er fjernet fra `src\`.

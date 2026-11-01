@@ -25,8 +25,8 @@
 ## 3. Risikosoner
 | Sone | Filer | Politikk |
 |---|---|---|
-| 0 Kjerne | `boot.py`, `updater.py` | Aldri over nett. Endres bare med kortet i USB her |
-| 1 Drift | `code.py`, `netconfig.py`, `wifisetup.py` | Over nett bare i nødsfall etter overleveringen, se §7 |
+| 0 Kjerne | `boot.py`, `code.py` (launcher), `updater.py` | Aldri over nett. Endres bare med kortet i USB her |
+| 1 Drift | `app.py`, `netconfig.py`, `wifisetup.py`, `captive.py`, `guard.py` | Over nett bare i nødsfall etter overleveringen, se §7 |
 | 2 Datatolking | `portal.py`, `vrm.py` | Over nett. Feil fanges allerede i drift |
 | 3 Presentasjon | `screen.py`, `starwars.py` | Over nett, fritt og hyppig. Tegnefeil skal ikke kunne krasje kortet (fase 1) |
 

@@ -1,6 +1,6 @@
 # PROGRESS
 
-Sist oppdatert: 2026-11-01, OTA fase 0 og 1 ferdig. Neste: fase 2 (oppdaterer, krever kortet i lader).
+Sist oppdatert: 2026-11-01, OTA fase 0, 1 og kode for fase 2 ferdig. Neste: benketest i lader (fase 2/3), se «OTA-benketest» under.
 
 ## Status
 Kortet virker og er nesten klart til å gis bort. Faren eller sønnen til Nils skal kunne sette i
@@ -53,6 +53,24 @@ driftsbildet fra Lovable.
   ga «tegning feilet» i loggen, og hentingen (VRM, minne) gikk videre i to runder. Rullet tilbake
   med ny deploy; `screen.py` på kortet er identisk med `src\`. «Tegnefeil»-reservebildet er ikke
   sett på skjermen, bare logget. 39 PC-tester passerer.
+
+- OTA fase 2, koden (01.11, 61 PC-tester): `src/updater.py` (sone 0), `tools/publish.py`, `update.json`.
+  `code.py` er nå en liten launcher (sone 0) og selve programmet ligger i `src/app.py`, slik at en
+  syntaksfeil i en ny versjon gir omstart og dermed tilbakerulling (ellers står kortet stille).
+  Kortet sjekker etter første vellykkede runde og så hver time; ved ny versjon lastes filer ned og
+  sha256-sjekkes, forrige versjon legges i `ota/prev/`, tilstanden i `ota/state.json`. Ukvittert etter
+  3 starter eller 4 min uten kvittering gir tilbakerulling, og versjonen merkes «bad» og hoppes over.
+  Målt på kortet: hashlib sha256 og TLS mot raw.githubusercontent virker; med PC på USB svarer
+  oppdatereren «skrivebeskyttet» (OSError 30). Tørrkjøring på PC mot ekte GitHub-URL-er hentet 0.2.1.
+- Kjente begrensninger: en hengende (ikke krasjende) app gir ingen omstart; en god versjon kan
+  rulles tilbake hvis Lovable er nede i over 4 min rett etter oppdatering (publiser da nytt versjonsnummer).
+  Sikkerheten er GitHub-kontoen: slå på 2FA. Zone 1 over nett krever `tools\publish.py --allow-zone1`.
+
+## OTA-benketest (kortet står på 0.2.0, manifestet på 0.2.1)
+1. Kortet i lader uten datalinjer. Forventet: «Oppdaterer til v0.2.1», restart, og «Programvare v0.2.1» glir over bunnlinja.
+2. Kortet tilbake i PC: sjekk `version.py`, `ota/state.json` (pending false), at `screen.py` er lik `src\`.
+3. Publiser ødelagt 0.2.2 (syntaksfeil i `screen.py`): kortet i lader skal bli mørkt, starte på nytt tre ganger og
+   komme tilbake på 0.2.1. Etterkontroll: `ota/state.json` har `bad: 0.2.2`.
 
 ## Plan
 1. Koble kortet fra og til igjen, både i PC og lader, og se at konsollen ikke vises.
