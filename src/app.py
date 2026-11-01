@@ -152,7 +152,7 @@ def draw_failed(name, exc):
     show_splash("Tegnefeil", "%s v%s" % (type(exc).__name__, VERSION))
 
 
-def check_update(session):
+def check_update(session, screen):
     """Henter ny versjon hvis Nils har publisert. Startes på nytt når noe er byttet inn."""
 
     def progress(version):
@@ -166,6 +166,9 @@ def check_update(session):
     if status == "oppdatert":
         time.sleep(2)
         microcontroller.reset()
+    # I lader finnes ingen logg, så resultatet må kunne leses på skjermen.
+    if status != "ingen ny":
+        screen.start_ticker("Oppdatering: " + status)
 
 
 def failure_text(reason, last_ok):
@@ -284,7 +287,7 @@ def main():
                 microcontroller.reset()
         elif got and now >= next_update:
             next_update = now + UPDATE_EVERY_S
-            check_update(sessions[-1])
+            check_update(sessions[-1], screen)
         polls += 1
         # Bare når bildet er ferskt: ved feil eier bunnlinja feilmeldingen.
         if fresh and prefix is None and polls % QUOTE_EVERY_N_POLLS == 0:

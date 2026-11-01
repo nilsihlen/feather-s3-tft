@@ -4,7 +4,10 @@ Se docs\\PLAN_ota.md. Kortet henter `update.json` og filene i den, sjekker sha25
 bytter dem inn. Før bytte skrives tilstanden til `ota/state.json`, og forrige versjon
 ligger i `ota/prev/`. Programmet kvitterer med `acknowledge()` etter første vellykkede
 runde. Starter kortet MAX_BOOTS ganger uten kvittering, ruller `boot_check()` tilbake.
-CircuitPython kan bare skrive når ingen PC holder USB-disken, så alt hoppes over da.
+
+CircuitPython er skrivebeskyttet for kode som standard, også uten PC. Skrivetilgang må bes
+om med storage.remount, og den låses igjen etterpå. Står kortet i PC, hoppes alt over,
+unntatt i boot.py, der USB ikke har startet ennå.
 """
 
 import hashlib
@@ -19,6 +22,30 @@ MAX_BOOTS = 3
 NEVER = ("boot.py", "code.py", "updater.py", "settings.toml")
 ZONES_ALLOWED = (2, 3)
 CHUNK = 1024
+
+
+def _remount(readonly):
+    try:
+        import storage
+    except ImportError:  # PC-testene
+        return
+    storage.remount("/", readonly=readonly)
+
+
+def _usb_connected():
+    try:
+        import supervisor
+    except ImportError:  # PC-testene
+        return False
+    return supervisor.runtime.usb_connected
+
+
+def _lock():
+    """Etter skriving: tilbake til standard, så en PC kan skrive til disken."""
+    try:
+        _remount(True)
+    except (OSError, RuntimeError) as exc:
+        print("kunne ikke låse disken:", repr(exc))
 
 
 def _exists(path):
@@ -104,29 +131,36 @@ def pending(root="/"):
 
 
 def writable(root="/"):
-    """Disken kan skrives bare når ingen PC holder den."""
+    """Ber om skrivetilgang. False når en PC holder disken. Kall _lock() etterpå."""
+    if _usb_connected():
+        return False
     try:
+        _remount(False)
         _mkdirs(root, "ota/x")
         with open(root + "ota/.probe", "w") as handle:
             handle.write("x")
         os.remove(root + "ota/.probe")
         return True
-    except OSError:
+    except (OSError, RuntimeError):
         return False
 
 
 def acknowledge(root="/"):
     """Programmet har kjørt og tegnet. Behold den nye versjonen. False hvis disken er låst."""
+    state = _read_state(root)
+    if not state.get("pending"):
+        return True
+    if not writable(root):
+        return False
     try:
-        state = _read_state(root)
-        if not state.get("pending"):
-            return True
         state.update(pending=False, boots=0)
         _write_state(root, state)
         _remove_tree(root + "ota/prev")
         return True
     except OSError:
         return False
+    finally:
+        _lock()
 
 
 def _rollback(root, state):
@@ -153,12 +187,16 @@ def boot_check(root="/", log=print):
         if not state.get("pending"):
             return None
         state["boots"] = state.get("boots", 0) + 1
-        if state["boots"] < MAX_BOOTS:
-            _write_state(root, state)
-            return None
-        log("oppdatering ikke kvittert, ruller tilbake til", state.get("from"))
-        _rollback(root, state)
-        return "rullet tilbake"
+        _remount(False)
+        try:
+            if state["boots"] < MAX_BOOTS:
+                _write_state(root, state)
+                return None
+            log("oppdatering ikke kvittert, ruller tilbake til", state.get("from"))
+            _rollback(root, state)
+            return "rullet tilbake"
+        finally:
+            _lock()
     except Exception as exc:
         log("boot_check feilet:", repr(exc))
         return None
@@ -195,17 +233,29 @@ def check(session, current, root="/", url=MANIFEST_URL, log=print, progress=None
     """Henter og bytter inn ny versjon. Kaster aldri.
 
     Returnerer «oppdatert» (kortet må startes på nytt), «ingen ny», «skrivebeskyttet»,
-    «venter på kvittering», «dårlig versjon» eller «feilet».
+    «venter på kvittering», «avvist versjon» eller «feilet». Grunnen til siste resultat
+    ligger i `ota/last.txt`, for i lader finnes ingen logg.
     """
     try:
-        return _check(session, current, root, url, log, progress)
+        status = _check(session, current, root, url, log, progress)
+        detail = status
     except Exception as exc:
         log("oppdatering feilet:", repr(exc))
+        status = "feilet"
+        detail = "feilet: " + repr(exc)
         try:
             _remove_tree(root + "ota/stage")
         except OSError:
             pass
-        return "feilet"
+    if status != "skrivebeskyttet" and status != "venter på kvittering":
+        try:
+            with open(root + "ota/last.txt", "w") as handle:
+                handle.write(detail + "\n")
+            _sync()
+        except OSError:
+            pass
+        _lock()
+    return status
 
 
 def _check(session, current, root, url, log, progress):
@@ -222,7 +272,7 @@ def _check(session, current, root, url, log, progress):
     if _version_tuple(version) <= _version_tuple(current):
         return "ingen ny"
     if version == state.get("bad"):
-        return "dårlig versjon"
+        return "avvist versjon"
     _validate(manifest)
 
     todo = []

@@ -58,8 +58,9 @@ oppsettbildet.
 
 ### Fase 2 – Oppdaterer (på benken, i lader)
 **Gjøres:** `updater.py` + manifest `update.json` (versjon, soner, filer med sha256).
-Kjøres fra oppstarten FØR hovedprogrammet, bare når kortet står i lader: CircuitPython kan
-kun skrive til egen lagring når ingen PC holder USB-disken. Nedlasting verifiseres mot
+Kjøres fra `app.py` etter første vellykkede runde og så hver time, bare når kortet står i lader:
+CircuitPython er skrivebeskyttet for kode som standard, også uten PC, så oppdatereren ber om
+skrivetilgang med `storage.remount`, og det nektes med PC tilkoblet. Nedlasting verifiseres mot
 sjekksum, forrige versjon beholdes, og et «uverifisert»-flagg settes. `code.py` kvitterer
 flagget etter første vellykkede runde med henting og tegning. Oppstart med ukvittert flagg
 ruller tilbake til forrige versjon. `boot.py` og `updater.py` står aldri i manifestet.

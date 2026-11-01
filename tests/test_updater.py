@@ -3,8 +3,10 @@ import json
 import os
 import sys
 import tempfile
+import types
 import unittest
 from pathlib import Path
+from unittest import mock
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "src"))
@@ -211,7 +213,7 @@ class UpdaterTest(unittest.TestCase):
         for _ in range(updater.MAX_BOOTS):
             updater.boot_check(self.root, log=self.log)
         session = session_for(manifest, files)
-        self.assertEqual(self.check(session), "dårlig versjon")
+        self.assertEqual(self.check(session), "avvist versjon")
         self.assertEqual(session.requests, [URL])
         files3, manifest3 = self.release("0.3.0")
         self.assertEqual(self.check(session_for(manifest3, files3)), "oppdatert")
@@ -228,6 +230,89 @@ class UpdaterTest(unittest.TestCase):
         self.write("ota/state.json", b"{ikke json")
         self.assertIsNone(updater.boot_check(self.root, log=self.log))
         self.assertFalse(updater.pending(self.root))
+
+
+class FakeStorage:
+    def __init__(self, error=None):
+        self.calls = []
+        self.error = error
+
+    def remount(self, path, readonly=False):
+        self.calls.append((path, readonly))
+        if self.error and not readonly:
+            raise self.error
+
+
+class CircuitPythonRulesTest(UpdaterTest):
+    """Kode er skrivebeskyttet som standard, så alt må gå via storage.remount."""
+
+    def install(self, usb=False, error=None):
+        self.storage = FakeStorage(error)
+        runtime = types.SimpleNamespace(usb_connected=usb)
+        fakes = {"storage": self.storage, "supervisor": types.SimpleNamespace(runtime=runtime)}
+        patcher = mock.patch.dict(sys.modules, fakes)
+        patcher.start()
+        self.addCleanup(patcher.stop)
+
+    def setUp(self):
+        super().setUp()
+        self.install()
+
+    def test_check_unlocks_then_locks_disk(self):
+        files, manifest = self.release()
+        self.assertEqual(self.check(session_for(manifest, files)), "oppdatert")
+        self.assertEqual(self.storage.calls[0], ("/", False))
+        self.assertEqual(self.storage.calls[-1], ("/", True))
+
+    def test_locks_disk_when_nothing_new(self):
+        files, manifest = self.release("0.1.0")
+        self.assertEqual(self.check(session_for(manifest, files)), "ingen ny")
+        self.assertEqual(self.storage.calls[-1], ("/", True))
+
+    def test_pc_attached_never_touches_disk(self):
+        self.install(usb=True)
+        session = FakeSession({})
+        self.assertEqual(self.check(session), "skrivebeskyttet")
+        self.assertEqual(self.storage.calls, [])
+        self.assertEqual(session.requests, [])
+
+    def test_remount_refused_by_usb_is_read_only(self):
+        self.install(error=RuntimeError("Cannot remount path when visible via USB."))
+        self.assertEqual(self.check(FakeSession({})), "skrivebeskyttet")
+
+    def test_failure_reason_is_saved(self):
+        files, manifest = self.release()
+        session = session_for(manifest, files, **{BASE + "screen.py": b"skadet"})
+        self.assertEqual(self.check(session), "feilet")
+        self.assertIn(b"feil sjekksum", self.read("ota/last.txt"))
+        self.assertEqual(self.storage.calls[-1], ("/", True))
+
+    def test_acknowledge_with_pc_attached_keeps_pending(self):
+        files, manifest = self.release()
+        self.check(session_for(manifest, files))
+        self.install(usb=True)
+        self.assertFalse(updater.acknowledge(self.root))
+        self.assertTrue(updater.pending(self.root))
+
+    def test_acknowledge_locks_disk_again(self):
+        files, manifest = self.release()
+        self.check(session_for(manifest, files))
+        self.storage.calls.clear()
+        self.assertTrue(updater.acknowledge(self.root))
+        self.assertEqual(self.storage.calls, [("/", False), ("/", True)])
+
+    def test_boot_check_unlocks_even_with_pc_attached(self):
+        # I boot.py har USB ikke startet, så usb_connected er uten betydning der.
+        files, manifest = self.release()
+        self.check(session_for(manifest, files))
+        self.install(usb=True)
+        updater.boot_check(self.root, log=self.log)
+        self.assertEqual(self.storage.calls, [("/", False), ("/", True)])
+        self.assertEqual(json.loads(self.read("ota/state.json"))["boots"], 1)
+
+    def test_boot_check_without_pending_touches_nothing(self):
+        updater.boot_check(self.root, log=self.log)
+        self.assertEqual(self.storage.calls, [])
 
 
 class PublishTest(unittest.TestCase):
