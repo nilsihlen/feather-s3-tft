@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# Firmware
+*.bin
+*.uf2
+
+# Hemmeligheter, f.eks. WiFi-passord
+settings.toml
+secrets.py
+
+# Claude Code, lokale innstillinger
+.claude/settings.local.json
+
+# VRM-nøkkel, skal aldri inn i repoet
+token.txt
+vrm_token.txt
