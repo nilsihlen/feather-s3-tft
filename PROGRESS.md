@@ -1,7 +1,6 @@
 # PROGRESS
 
-Sist oppdatert: 2026-11-01, OTA fase 1 ferdig. Neste: Nils oppretter tomt offentlig repo
-`nilsihlen/feather-s3-tft` (fase 0, push gjenstår), så fase 2 (oppdaterer, krever kortet i lader).
+Sist oppdatert: 2026-11-01, OTA fase 0 og 1 ferdig. Neste: fase 2 (oppdaterer, krever kortet i lader).
 
 ## Status
 Kortet virker og er nesten klart til å gis bort. Faren eller sønnen til Nils skal kunne sette i
@@ -12,7 +11,7 @@ driftsbildet fra Lovable.
 - Lovable er eneste datakilde. Kortet kobler seg ikke til Cerbo GX direkte.
 - Kortet har TinnHytta lagret og henter data hvert 2. minutt.
 - Første commit er gjort lokalt (`main`), remote `origin` peker på `git@github-nilsihlen:nilsihlen/feather-s3-tft.git`.
-  Repoet finnes ikke på GitHub ennå og er ikke pushet.
+  Pushet 01.11 til https://github.com/nilsihlen/feather-s3-tft (offentlig). Raw-URL hentes uten innlogging (HTTP 200).
 
 ## Gjort
 - Flashet kortet: dobbeltrykk på RST virket ikke med fabrikkprogrammet, så det gikk via
