@@ -15,6 +15,7 @@ from adafruit_httpserver import GET, POST, Redirect, Request, Response, Server
 import captive
 import netconfig
 from screen import show_splash
+from version import VERSION
 
 AP_SSID = "Skjerm"
 PORT = 80
@@ -109,6 +110,7 @@ def show_wifi_step(password, reason=None):
     _line(root, 64, 2, "3 Passord %s" % password, x=6)
     note = "Fikk ikke kontakt. Prov igjen." if reason else "Da kommer siden opp av seg selv"
     _line(root, 106, 1, note, AMBER, x=6)
+    _line(root, 122, 1, "v" + VERSION, 0x8A8A8A, x=6)
     board.DISPLAY.root_group = root
 
 

@@ -4,13 +4,14 @@ import board
 import supervisor
 
 from screen import Screen, show_splash
+from version import VERSION
 
 # PC-en kan røre disken når kortet kobles til, og det skal ikke stoppe driftsbildet.
 # tools\deploy.ps1 starter kortet på nytt etter oppdatering.
 supervisor.runtime.autoreload = False
 
 # boot.py slo av lyset. Det tennes her, før de tunge importene, så konsollen aldri vises.
-show_splash("Starter")
+show_splash("Starter", "v" + VERSION)
 board.DISPLAY.brightness = 1
 
 import gc  # noqa: E402
@@ -24,6 +25,7 @@ import digitalio  # noqa: E402
 import microcontroller  # noqa: E402
 import wifi  # noqa: E402
 
+from guard import Guarded  # noqa: E402
 import netconfig  # noqa: E402
 import portal  # noqa: E402
 import vrm  # noqa: E402
@@ -139,6 +141,11 @@ def fetch_any(sessions):
     return fetch(sessions[-1])
 
 
+def draw_failed(name, exc):
+    """Reservetekst når tegningen feiler. Henteløkka går videre og prøver igjen."""
+    show_splash("Tegnefeil", "%s v%s" % (type(exc).__name__, VERSION))
+
+
 def failure_text(reason, last_ok):
     if last_ok is None:
         return reason
@@ -174,7 +181,7 @@ def main():
         adafruit_requests.Session(pool, ssl.create_default_context()),
     )
 
-    screen = Screen()
+    screen = Guarded(Screen(), draw_failed)
     first_pass = True
     last_ok = None  # sist noe ferskt ble vist, fra Lovable eller VRM
     last_lovable = None

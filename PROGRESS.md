@@ -1,7 +1,7 @@
 # PROGRESS
 
-Sist oppdatert: 2026-11-01, øktslutt med handover. Ny økt: les `docs/HANDOVER_20261101.md`
-og kjør OTA-planen derfra. Nils har sagt ja til fase 0 med offentlig repo på privatkontoen.
+Sist oppdatert: 2026-11-01, OTA fase 1 ferdig. Neste: Nils oppretter tomt offentlig repo
+`nilsihlen/feather-s3-tft` (fase 0, push gjenstår), så fase 2 (oppdaterer, krever kortet i lader).
 
 ## Status
 Kortet virker og er nesten klart til å gis bort. Faren eller sønnen til Nils skal kunne sette i
@@ -11,7 +11,8 @@ driftsbildet fra Lovable.
 - Kortet kjører CircuitPython 10.3.1 med TinyUF2 0.35.0, på COM7 sist.
 - Lovable er eneste datakilde. Kortet kobler seg ikke til Cerbo GX direkte.
 - Kortet har TinnHytta lagret og henter data hvert 2. minutt.
-- Ingenting er committet, og det finnes ikke noe GitHub-repo ennå.
+- Første commit er gjort lokalt (`main`), remote `origin` peker på `git@github-nilsihlen:nilsihlen/feather-s3-tft.git`.
+  Repoet finnes ikke på GitHub ennå og er ikke pushet.
 
 ## Gjort
 - Flashet kortet: dobbeltrykk på RST virket ikke med fabrikkprogrammet, så det gikk via
@@ -47,6 +48,12 @@ driftsbildet fra Lovable.
 - Slo av auto-reload etter at konsollen kom opp da kortet ble koblet til igjen. Skriving til
   disken stopper ikke lenger programmet.
 - La inn krasj-vern: kortet starter på nytt etter 10 sekunder. Begge deler er testet på kortet.
+
+- OTA fase 1 (01.11, versjon 0.1.0): `src/version.py`, `src/guard.py` (tegnevakt, 5 tester) og
+  versjon synlig ved oppstart og i oppsettbildet. Benketest på kortet: en bevisst feil i `Screen.show`
+  ga «tegning feilet» i loggen, og hentingen (VRM, minne) gikk videre i to runder. Rullet tilbake
+  med ny deploy; `screen.py` på kortet er identisk med `src\`. «Tegnefeil»-reservebildet er ikke
+  sett på skjermen, bare logget. 39 PC-tester passerer.
 
 ## Plan
 1. Koble kortet fra og til igjen, både i PC og lader, og se at konsollen ikke vises.
