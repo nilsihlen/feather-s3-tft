@@ -74,6 +74,43 @@ driftsbildet fra Lovable.
   rulles tilbake hvis Lovable er nede i over 4 min rett etter oppdatering (publiser da nytt versjonsnummer).
   Sikkerheten er GitHub-kontoen: slå på 2FA. Zone 1 over nett krever `tools\publish.py --allow-zone1`.
 
+## Neste økt: start her
+Les denne seksjonen og «OTA-status». `docs/HANDOVER_20261101.md` er utdatert: fase 0 til 3 er kjørt, og
+dens påstand om at kortet kan skrive når det står i lader, er feil.
+
+Tilstand ved øktslutt 01.11: kortet står i PC-en på COM7 med v0.2.4, lik `src\` og lik `update.json` på
+`main`. Wifi TinnHytta og VRM-nøkkelen ligger fortsatt på kortet. Alt er committet og pushet.
+
+Venter på Nils:
+1. Skal VRM-nøkkelen bli med på kortet? (A3)
+2. Skal kortet tømmes («tøm kortet») før det gis bort?
+3. 2FA på GitHub-kontoen `nilsihlen`. Ikke bekreftet at det er på.
+4. Vil Nils likevel se hele tilbakerullingen i lader før kortet gis bort? Publiser da en ødelagt versjon
+   (0.2.5 eller høyere), og en ren versjon rett etterpå. Kortet må ikke stå i lader mens den ødelagte ligger ute,
+   med mindre det er selve testen.
+
+Slik publiserer du over nett:
+1. Øk `src/version.py`, commit `src\`.
+2. `python tools\publish.py` (`--allow-zone1` bare hvis Nils har godtatt risikoen). Commit og push `update.json`.
+3. Vent til raw-URL-en viser ny versjon (tok ca. 10 s sist). Kortet sjekker ved oppstart og hver time, og bare
+   når det ikke står i PC. Sone 0 (`boot.py`, `code.py`, `updater.py`) kan bare endres over USB.
+
+Lært denne økta:
+- Kortet er skrivebeskyttet for kode som standard, også i lader. `storage.remount` virker i `boot.py`, og under
+  kjøring bare uten PC. PC-tester sier ingenting om dette: test skriving på ekte kort FØR Nils flytter det.
+- Skriveløypa kan testes med PC tilkoblet: legg midlertidig `storage.remount("/", readonly=False)` sist i
+  `boot.py`, overstyr `updater._usb_connected` og `updater._remount` fra REPL, og bruk `root="/ot/"`. Rydd etterpå.
+- Hard omstart (`microcontroller.reset()`) trengs for å kjøre `boot.py`. Ctrl-D kjører den ikke.
+- Lader gir ingen logg. Filtidene på kortet er tid siden strøm på (2000-01-01 00:00:00) og overlever omstart, så
+  `os.stat` gir tidslinjen. `ota/last.txt` har siste resultat, og rulleteksten «Oppdatering: ...» viser det på skjermen.
+- `tools\repl.py` sender kode linje for linje. Sendes alt i ett, mister kortet tegn.
+- En testkjøring kan legge igjen `bad` i `ota/state.json`. Da avvises den versjonen, så bruk neste nummer.
+- Slett ikke `/d/ota` med `rm -rf`: sikkerhetssjekken stopper det. Det kreves heller ikke.
+- `gh` står aktivt på jobbkontoen `nilsihlen10n`. Push går med ren git via `github-nilsihlen`.
+
+Åpent: hvorfor første runde tok 56 s i lader mot 17 s i PC. Mistanken er kald wifi eller et Lovable-forsøk som
+tidsavbrøt, men det er ikke målt. Sammenlign `ota/last.txt`-tiden i lader med en kaldstart i PC.
+
 ## OTA-status 01.11: v0.2.4 på kortet og på GitHub
 Nils stoppet testingen 01.11 og godtok risikoen: «Legg inn endelig versjon, så satser vi på at alt er bra.»
 Planens port i fase 3 er derfor ikke fullt oppfylt.
@@ -94,14 +131,10 @@ Planens port i fase 3 er derfor ikke fullt oppfylt.
 4. Test på en Android-telefon.
 5. Si «tøm kortet» rett før kortet gis bort, hvis det er satt opp på nytt. Da kjøres
    `tools\forget_wifi.py`, wifi-passordet forsvinner, og QR-koden kommer med en gang.
-6. Commit og opprett repo på Nils' private GitHub-konto, når Nils sier fra. Sjekk først at
-   token-filer ikke er med (`.gitignore` har `token.txt`/`vrm_token.txt`).
-7. OTA-plan skrevet 01.11 (`docs/PLAN_ota.md`): kortet henter kode selv fra GitHub, risikosoner,
-   automatisk tilbakerulling, alt maskinvaretestes på benken FØR kortet gis bort (Nils har ett
-   kort). Venter på A1-beslutning (offentlig repo + brukernavn) før fase 0. Tailscale på kortet
-   er umulig: ingen OS.
+6. Repo og OTA er ferdig, se «OTA-status».
+7. Andre åpne tester står i punkt 1 til 4.
 8. Vurder senere: så 24-timerskurven fra VRM-historikk ved oppstart, og VRM MQTT for sekundtall.
-8. Før kortet gis bort: avgjør om VRM-nøkkelen skal bli med på kortet (den som har kortet, kan
+9. Før kortet gis bort: avgjør om VRM-nøkkelen skal bli med på kortet (den som har kortet, kan
    lese den) eller fjernes fra settings.toml. Den kan alltid trekkes tilbake i VRM-portalen.
 
 ## Funn fra nettet 01.11
