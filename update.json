@@ -1,5 +1,5 @@
 {
- "version": "0.2.1",
+ "version": "0.2.3",
  "base": "https://raw.githubusercontent.com/nilsihlen/feather-s3-tft/main/src/",
  "files": {
   "portal.py": {
@@ -14,8 +14,8 @@
   },
   "screen.py": {
    "zone": 3,
-   "sha256": "b3aa909fcb3996332970465131b291c35ca3e55faa66ba6a554aaac159bbe46e",
-   "size": 8813
+   "sha256": "93244d90c3e8f86bde58d6a34a8ea5a6baa4d256a88c8a641d46c27b7990a26b",
+   "size": 8820
   },
   "starwars.py": {
    "zone": 3,
@@ -24,7 +24,7 @@
   },
   "version.py": {
    "zone": 3,
-   "sha256": "db806b1c55c590e156263b5ef956a4d3c8305c73d43a47c9a5e728d1ce12ce78",
+   "sha256": "6f6076ac50c3fa363ca1d3cd2503400ce6599d02728acc3c7d2f7290db6d9431",
    "size": 97
   },
   "vrm.py": {
