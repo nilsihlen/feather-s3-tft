@@ -1,0 +1,4 @@
+* text=auto eol=lf
+*.mpy binary
+*.uf2 binary
+*.bin binary
