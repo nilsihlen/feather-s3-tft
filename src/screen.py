@@ -5,6 +5,8 @@ import displayio
 import terminalio
 from adafruit_display_text import label
 
+from version import VERSION
+
 WHITE = 0xFFFFFF
 GREY = 0x707070
 DIM = 0x8A8A8A
@@ -115,6 +117,8 @@ class Screen:
 
     def activate(self):
         board.DISPLAY.root_group = self._root
+        # Versjonen glir over bunnlinja ved hver oppstart, så den kan leses over telefon (M4).
+        self.start_ticker("Programvare v" + VERSION)
 
     def _make_graph(self, root):
         self._bitmap = displayio.Bitmap(WIDTH, GRAPH_H, 4)
