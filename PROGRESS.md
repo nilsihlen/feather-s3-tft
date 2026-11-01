@@ -1,6 +1,6 @@
 # PROGRESS
 
-Sist oppdatert: 2026-11-01, OTA fase 0, 1 og kode for fase 2 ferdig. Neste: benketest i lader (fase 2/3), se «OTA-benketest» under.
+Sist oppdatert: 2026-11-01. OTA er i drift på v0.2.4, se «OTA-status». Før kortet gis bort: se punktene i Plan.
 
 ## Status
 Kortet virker og er nesten klart til å gis bort. Faren eller sønnen til Nils skal kunne sette i
@@ -74,13 +74,17 @@ driftsbildet fra Lovable.
   rulles tilbake hvis Lovable er nede i over 4 min rett etter oppdatering (publiser da nytt versjonsnummer).
   Sikkerheten er GitHub-kontoen: slå på 2FA. Zone 1 over nett krever `tools\publish.py --allow-zone1`.
 
-## OTA-benketest (kortet står på 0.2.0, manifestet på 0.2.1)
-1. Kortet i lader. Forventet: «Oppdaterer til v0.2.1», restart, og «Programvare v0.2.1» glir over bunnlinja.
-   Feiler den, står grunnen i rulleteksten «Oppdatering: ...». Kortet har `updater.py`, `boot.py` og `app.py`
-   fra `src\`, men `screen.py` og `version.py` er fortsatt 0.2.0: ikke kjør `deploy.ps1` før testen er ferdig.
-2. Kortet tilbake i PC: sjekk `version.py`, `ota/state.json` (pending false), at `screen.py` er lik `src\`.
-3. Publiser ødelagt 0.2.2 (syntaksfeil i `screen.py`): kortet i lader skal bli mørkt, starte på nytt tre ganger og
-   komme tilbake på 0.2.1. Etterkontroll: `ota/state.json` har `bad: 0.2.2`.
+## OTA-status 01.11: v0.2.4 på kortet og på GitHub
+Nils stoppet testingen 01.11 og godtok risikoen: «Legg inn endelig versjon, så satser vi på at alt er bra.»
+Planens port i fase 3 er derfor ikke fullt oppfylt.
+- Sett i lader: kortet hentet v0.2.1 selv, byttet filene og kvitterte (`ota/state.json`). M1 er vist.
+- Sett på ekte kort med PC tilkoblet: ødelagt `screen.py` med ukvittert flagg rullet tilbake på ca. 38 s med
+  ekte omstarter. Ekte nedlasting og tilbakerulling er også kjørt i en testmappe.
+- IKKE sett: hele løpet i lader, altså at kortet selv henter en ødelagt versjon og ruller tilbake. M2 er ikke
+  bevist i lader. v0.2.3 var den planlagte testen, ble aldri hentet av kortet, og ble avløst av v0.2.4.
+- Første oppstart i lader tok 56 s til første runde, mot 17 s i PC. Årsaken er ukjent. Ufarlig for oppdateringen.
+- Versjonene 0.2.2 og 0.2.3 er brukt opp. Neste publisering må være 0.2.5 eller høyere.
+- `ota/state.json` på kortet har en rest (`bad: 0.2.2`) fra USB-testen. Den er ufarlig.
 
 ## Plan
 1. Koble kortet fra og til igjen, både i PC og lader, og se at konsollen ikke vises.
