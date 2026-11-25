@@ -29,8 +29,10 @@ TILE_LABEL_Y = 77
 TILE_VALUE_Y = 87
 ETA_Y = 108
 FOOTER_Y = 118
-# Tiden nederst til høyre er høyst 10 tegn, «ny om 59 s».
-STATUS_W = 60
+# Nederst til høyre: versjonen («v2.6») og så sekundene som teller ned. Feltet for
+# sekundene er 6 tegn bredt («henter» er lengst), og versjonen står rett til venstre for det.
+STATUS_CHARS = 6
+STATUS_W = 70
 
 # Under gul og rød grense skifter SOC-tallet farge. Aggregatplanen lader fra 20 %.
 SOC_RED = 20
@@ -68,6 +70,11 @@ def _rh_color(rh, limit):
     if rh >= RH_AMBER:
         return AMBER
     return GREEN
+
+
+def short_version(version):
+    """«0.2.6» skrives «v2.6». Nullen foran er alltid 0 så lenge programmet er under 1.0."""
+    return "v" + (version[2:] if version.startswith("0.") else version)
 
 
 def _hours(hours):
@@ -130,6 +137,10 @@ class Screen:
         self._eta = _text(root, 239, ETA_Y, 1, DIM, anchor=(1, 0))
         self._detail = _text(root, 0, FOOTER_Y, 1, DIM)
         self._status = _text(root, 239, FOOTER_Y, 1, DIM, anchor=(1, 0))
+        self._version = _text(
+            root, 239 - 6 * STATUS_CHARS - 6, FOOTER_Y, 1, DIM, anchor=(1, 0),
+            text=short_version(VERSION),
+        )
         # Blå etikett når tallene kommer ferske fra Cerbo-en via VRM-skyen.
         self._cerbo = label.Label(
             terminalio.FONT, text="Cerbo online", color=WHITE,
@@ -214,8 +225,16 @@ class Screen:
         if item.color != color:
             item.color = color
 
+    def _put_status(self, text, color):
+        """Skriver bunnlinja til høyre. Versjonen vises bare når det er plass til den."""
+        self._set(self._status, text, color)
+        self._sync_version()
+
+    def _sync_version(self):
+        self._version.hidden = not self._ticker.hidden or len(self._status.text) > STATUS_CHARS
+
     def show_message(self, status, color=AMBER):
-        self._set(self._status, status, color)
+        self._put_status(status, color)
 
     def show_stale(self, status):
         """Et gammelt bilde skal ikke se ferskt ut."""
@@ -229,7 +248,7 @@ class Screen:
         self.set_cerbo(False)
         self._set(self._eta, "", DIM)
         self._set(self._detail, "", DIM)
-        self._set(self._status, status, AMBER)
+        self._put_status(status, AMBER)
 
     def show(self, data, age):
         self._show_cellar(data)
@@ -257,7 +276,7 @@ class Screen:
         self._set(self._tiles[1], _number(data["load_w"]), WHITE)
         room = (WIDTH - STATUS_W - self._detail.anchored_position[0] - 6) // 6
         self._set(self._detail, _detail_text(data, room), DIM)
-        self._set(self._status, age, GREEN)
+        self._put_status(age, GREEN)
 
         error = data["vebus_error"]
         self._alarm.hidden = not error
@@ -271,7 +290,7 @@ class Screen:
 
     def show_age(self, text):
         """Rapportalderen nederst til høyre, kalt hvert sekund mellom hentingene."""
-        self._set(self._status, text, GREEN)
+        self._put_status(text, GREEN)
 
     def start_ticker(self, text):
         """Starter et sitat som glir over bunnlinja, fra høyre kant og ut til venstre."""
@@ -281,6 +300,7 @@ class Screen:
         # Bunnlinjene gjemmes mens sitatet glir, så tekstene ikke ligger oppå hverandre.
         self._detail.hidden = True
         self._status.hidden = True
+        self._version.hidden = True
 
     def step_ticker(self):
         """Flytter sitatet litt mot venstre. Kalles fra ventesløyfa mellom hentingene."""
@@ -291,6 +311,7 @@ class Screen:
             self._ticker.hidden = True
             self._detail.hidden = False
             self._status.hidden = False
+            self._sync_version()
 
     def _show_cellar(self, data):
         rh = data["cellar_rh"]

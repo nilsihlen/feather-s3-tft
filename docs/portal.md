@@ -9,7 +9,7 @@ ingen hemmelighet til portalen på kortet.
 |---|---|
 | Adresse | `https://od3-foundation.lovable.app/api/live` |
 | Størrelse | Ca. 13 kB. Tok 3,3 s på kortet, med ca. 1,9 MB ledig minne etterpå (01.11.2026) |
-| Henting | Hvert minutt, Lovable og VRM i samme runde. Nederst til høyre teller sekundene ned til neste henting («ny om 42 s»), og «henter» står der mens den pågår |
+| Henting | Hvert minutt, Lovable og VRM i samme runde. Nederst til høyre står versjonen kort («v2.7» for 0.2.7) og rett ved siden av den sekundene som teller ned til neste henting («42 s»). «henter» står der mens den pågår. Versjonen skjules mens rulleteksten glir og ved lange feilmeldinger |
 | Robusthet | To forsøk mot Lovable per runde. Ved glipp beholdes forrige bilde i inntil 3 minutter («nytt forsok - 42»), så grånes det. VRM hentes uavhengig av Lovable-runden: klokka huskes fra forrige portalsvar. Er portalen nede over 10 minutter mens VRM lever, viser bunnlinja «portal 12 min» |
 | Rotsertifikat | GTS Root R4, gyldig til 2036, i `src/portal_root.pem` |
 
