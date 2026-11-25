@@ -1,6 +1,6 @@
 # PROGRESS
 
-Sist oppdatert: 2026-11-25. Ny layout i v0.2.5 og temperatur i v0.2.6 (ikke publisert), se «Visuell endring 25.11». OTA er i drift, se «OTA-status». Før kortet gis bort: se punktene i Plan.
+Sist oppdatert: 2026-11-25. Ny layout i v0.2.5 og temperatur i v0.2.6, se «Visuell endring 25.11». OTA er i drift, se «OTA-status». Før kortet gis bort: se punktene i Plan.
 
 ## Status
 Kortet virker og er nesten klart til å gis bort. Faren eller sønnen til Nils skal kunne sette i
@@ -82,8 +82,8 @@ driftsbildet fra Lovable.
   og frekvens står på bunnlinja mens aggregatet går. Kurven under det store feltet er SOC siste 24 t.
 - v0.2.5 viste temperaturen bare første 20 min etter hver rapport (portalens regel), altså `--` det meste av timen.
   v0.2.6 henter derfor temperaturen fra `/api/history?kun=status` når `/api/live` ikke har den. Sett på kortet
-  25.11: `temperatur: 9.02` i loggen og «9 °C» på skjermen. v0.2.6 endrer `app.py` (sone 1): kopiert til kortet over USB,
-  IKKE publisert. `update.json` står på 0.2.5. Publisering krever `--allow-zone1`, som Nils må godta.
+  25.11: `temperatur: 9.02` i loggen og «9 °C» på skjermen. v0.2.6 endrer `app.py` (sone 1): kopiert til kortet over USB og
+  Publisert 25.11 med `--allow-zone1` (Nils godtok), og raw-URL-en viser 0.2.6. IKKE sett: at et kort i lader henter 0.2.6 selv.
 - 100 % fukt bruker ett hakk mindre skrift og skjuler døgnendringen.
 - `tools/screenshot.py` bruker testtall når kortet ikke har nett, og kjøres på Mac med `.venv/bin/python` og porten
   `/dev/cu.usbmodem...`. Nye testbilder: `temperatur`, `fukt100`.
