@@ -1,6 +1,6 @@
 # PROGRESS
 
-Sist oppdatert: 2026-11-25. Ny layout i v0.2.5, se «Visuell endring 25.11». OTA er i drift, se «OTA-status». Før kortet gis bort: se punktene i Plan.
+Sist oppdatert: 2026-11-25. Ny layout i v0.2.5 og temperatur i v0.2.6 (ikke publisert), se «Visuell endring 25.11». OTA er i drift, se «OTA-status». Før kortet gis bort: se punktene i Plan.
 
 ## Status
 Kortet virker og er nesten klart til å gis bort. Faren eller sønnen til Nils skal kunne sette i
@@ -74,14 +74,16 @@ driftsbildet fra Lovable.
   rulles tilbake hvis Lovable er nede i over 4 min rett etter oppdatering (publiser da nytt versjonsnummer).
   Sikkerheten er GitHub-kontoen: slå på 2FA. Zone 1 over nett krever `tools\publish.py --allow-zone1`.
 
-## Visuell endring 25.11 (v0.2.5)
+## Visuell endring 25.11 (v0.2.5 og v0.2.6)
 Ønske fra Nils: se fukt og temperatur i vinkjelleren først.
 - Øverst står nå VINKJELLER: fukt stort til venstre (grønn under 80 %, gul fra 80 %, rød over portalens grense)
   med `+5 24 t` (døgnendring) ved siden av, og temperatur stort til høyre.
 - Flisene er SOL, LAST, SOC og bank (etikett LADER W, TAPPER W eller HVILE W). AGGR W er fjernet; AC-spenning
   og frekvens står på bunnlinja mens aggregatet går. Kurven under det store feltet er SOC siste 24 t.
-- Temperaturen kommer bare fra portalen når rommålingen er under 20 min gammel, ellers vises `--`. Kortet holder
-  siste verdi til neste rapport. IKKE sett med ekte temperatur på skjermen: bildet «12 °C» bruker testtall.
+- v0.2.5 viste temperaturen bare første 20 min etter hver rapport (portalens regel), altså `--` det meste av timen.
+  v0.2.6 henter derfor temperaturen fra `/api/history?kun=status` når `/api/live` ikke har den. Sett på kortet
+  25.11: `temperatur: 9.02` i loggen og «9 °C» på skjermen. v0.2.6 endrer `app.py` (sone 1): kopiert til kortet over USB,
+  IKKE publisert. `update.json` står på 0.2.5. Publisering krever `--allow-zone1`, som Nils må godta.
 - 100 % fukt bruker ett hakk mindre skrift og skjuler døgnendringen.
 - `tools/screenshot.py` bruker testtall når kortet ikke har nett, og kjøres på Mac med `.venv/bin/python` og porten
   `/dev/cu.usbmodem...`. Nye testbilder: `temperatur`, `fukt100`.

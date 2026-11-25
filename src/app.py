@@ -121,6 +121,25 @@ def fetch(session):
         return portal.parse(response.json())
 
 
+def fetch_cellar_temp(sessions):
+    """Temperaturen i vinkjelleren fra portalens statussvar. Kaster aldri, None når den mangler.
+
+    /api/live har den bare første 20 min etter en rapport, og hytta rapporterer hver time.
+    """
+    for session in sessions:
+        try:
+            gc.collect()
+            with session.get(portal.STATUS_URL, headers=HEADERS, timeout=20) as response:
+                if response.status_code != 200:
+                    raise OSError("HTTP %d" % response.status_code)
+                temp = portal.parse_cellar_temp(response.json())
+            print("temperatur:", temp)
+            return temp
+        except Exception as exc:
+            print("temperatur feilet:", repr(exc))
+    return None
+
+
 def add_vrm(data, session):
     """Ferskere SOC, sol og forbruk fra VRM når Cerbo-en er online. Kaster aldri."""
     token = os.getenv("VRM_TOKEN")
@@ -213,6 +232,7 @@ def main():
     last_history = None
     last_report = None
     last_data = None  # forrige vellykkede Lovable-bilde
+    temp_cache = (None, None)  # (rapporten, temperaturen i vinkjelleren)
     epoch_ref = None  # (epoketid, monotonic) fra siste Lovable-svar
     polls = 0
     started = time.monotonic()
@@ -235,6 +255,15 @@ def main():
                     time.sleep(RETRY_PAUSE_S)
         now = time.monotonic()
         if fetched is not None:
+            # Portalen gir temperaturen bare mens rapporten er under 20 min gammel.
+            # Hentes én gang per rapport, og igjen neste runde hvis det glapp.
+            if fetched["cellar_temp"] is None:
+                if temp_cache[0] != fetched["report_at"]:
+                    temp = fetch_cellar_temp(sessions)
+                    if temp is not None:
+                        temp_cache = (fetched["report_at"], temp)
+                if temp_cache[0] == fetched["report_at"]:
+                    fetched["cellar_temp"] = temp_cache[1]
             epoch_ref = (fetched["now_epoch"], now)
             last_data = fetched
             last_lovable = now

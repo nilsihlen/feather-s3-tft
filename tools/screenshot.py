@@ -31,6 +31,10 @@ r = adafruit_requests.Session(socketpool.SocketPool(wifi.radio), c)
 x = r.get(portal.URL, headers={'User-Agent': 'feather-s3-tft'}, timeout=25)
 d = portal.parse(x.json())
 x.close()
+if d['cellar_temp'] is None:
+    x = r.get(portal.STATUS_URL, headers={'User-Agent': 'feather-s3-tft'}, timeout=25)
+    d['cellar_temp'] = portal.parse_cellar_temp(x.json())
+    x.close()
 s = screen.Screen()
 s.activate()
 s._history = [min(100, 40 + abs(120 - i) // 3) for i in range(239)]

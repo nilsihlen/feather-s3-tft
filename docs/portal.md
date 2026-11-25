@@ -50,7 +50,7 @@ så 24-timerskurven fra VRM-historikken ved oppstart, så den ikke starter tom.
 | Aggregatet | Ikke egen flis lenger. Bunnlinja viser `AC <volt>V <Hz>` når `ovrige.ac_source` er 2 |
 | VINKJELLER, stort tall øverst til venstre | `fukt.<enhet>.vinkjeller.doegntrend.til_rh_pct`. Grønn under 80 %, gul fra 80 %, rød over `rh_grense_pct` |
 | `+5 24 t` ved siden av fukten | `doegntrend.endring_pp`. Skjules ved 100 %, der det ikke er plass |
-| Temperatur øverst til høyre | `fukt.<enhet>.vinkjeller.kjeller.temp_c`. Portalen sender den bare når rommålingen er under 20 min gammel, ellers `--`. Kortet holder siste verdi til neste rapport |
+| Temperatur øverst til høyre | `fukt.<enhet>.vinkjeller.kjeller.temp_c` i `/api/live`, men den finnes bare når rommålingen er under 20 min gammel, og hytta rapporterer hver time. Er den borte, henter kortet `/api/history?kun=status` (4 kB, kun lesing) én gang per rapport og bruker `maalinger.sht45_vinkjeller_{high,low}_temp_c`, fra sensoren med høyest fukt. `--` bare hvis begge mangler |
 | Detaljlinjen | Operasjon som kjører eller teknisk rom, og startbatteriet. Med aggregat: AC inn |
 | Tid nederst til høyre | Alder på siste rapport, `now` − `last_report_at` |
 

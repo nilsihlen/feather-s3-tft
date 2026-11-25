@@ -92,6 +92,31 @@ def _bank_source(sources):
     return {}
 
 
+# Lettvektssvar (4 kB) med siste måling per sensor, uten aldersgrensen /api/live har på temperaturen.
+STATUS_URL = "https://od3-foundation.lovable.app/api/history?kun=status"
+_CELLAR_SENSORS = ("sht45_vinkjeller_high", "sht45_vinkjeller_low")
+
+
+def parse_cellar_temp(status):
+    """Temperaturen i vinkjelleren fra `/api/history?kun=status`, eller None.
+
+    Samme sensor som gir den høyeste fuktigheten, slik at fukt og temperatur hører sammen.
+    """
+    runs = _dict(status).get("kjoringer")
+    run = runs[0] if isinstance(runs, list) and runs else None
+    measured = _dict(_dict(run).get("maalinger"))
+    best = None
+    for sensor in _CELLAR_SENSORS:
+        temp = _dict(measured.get(sensor + "_temp_c")).get("value")
+        rh = _dict(measured.get(sensor + "_rh_pct")).get("value")
+        if not isinstance(temp, (int, float)):
+            continue
+        rank = rh if isinstance(rh, (int, float)) else -1
+        if best is None or rank > best[0]:
+            best = (rank, temp)
+    return None if best is None else best[1]
+
+
 def _humidity(rooms, room, key="til_rh_pct"):
     return _dict(_dict(rooms.get(room)).get("doegntrend")).get(key)
 

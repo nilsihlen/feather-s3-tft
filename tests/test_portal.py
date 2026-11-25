@@ -92,6 +92,24 @@ class ParseTests(unittest.TestCase):
         self.assertIsNone(data["cellar_rh_change"])
         self.assertEqual(data["cellar_rh"], 85.2)
 
+    def test_cellar_temp_from_status_uses_sensor_with_highest_rh(self):
+        status = {"kjoringer": [{"maalinger": {
+            "sht45_vinkjeller_high_temp_c": {"value": 9.02},
+            "sht45_vinkjeller_high_rh_pct": {"value": 85.2},
+            "sht45_vinkjeller_low_temp_c": {"value": 9.05},
+            "sht45_vinkjeller_low_rh_pct": {"value": 84.41},
+        }}]}
+        self.assertEqual(portal.parse_cellar_temp(status), 9.02)
+
+    def test_cellar_temp_from_status_falls_back_to_one_sensor(self):
+        status = {"kjoringer": [{"maalinger": {"sht45_vinkjeller_low_temp_c": {"value": 9.05}}}]}
+        self.assertEqual(portal.parse_cellar_temp(status), 9.05)
+
+    def test_cellar_temp_from_status_unknown_when_missing(self):
+        for status in (None, {}, {"kjoringer": []}, {"kjoringer": [{}]},
+                       {"kjoringer": [{"maalinger": {"sht45_vinkjeller_high_temp_c": {"value": None}}}]}):
+            self.assertIsNone(portal.parse_cellar_temp(status))
+
     def test_bank_uses_multiplus_not_batt_w(self):
         self.assertAlmostEqual(portal.parse(live())["bank_w"], 53.3 * -7.3 - 6.5)
 

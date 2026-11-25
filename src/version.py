@@ -1,3 +1,3 @@
 """Versjonen som står på kortet. Vises ved oppstart og i wifi-oppsettet."""
 
-VERSION = "0.2.5"
+VERSION = "0.2.6"
