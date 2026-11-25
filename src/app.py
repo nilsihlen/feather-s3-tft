@@ -85,7 +85,7 @@ def run_setup(reason=None):
 def idle_wait(button, screen, seconds, status_prefix=None):
     """Venter i `seconds`, driver rulleteksten og teller ned til neste henting.
 
-    Nedtellingen («42 s», med versjonen foran) viser at skjermen lever og nøyaktig når neste
+    Nedtellingen («ny om 42 s») viser at skjermen lever og nøyaktig når neste
     oppdatering kommer. Med `status_prefix` vises feilen foran nedtellingen.
     True hvis BOOT holdes inne i SETUP_HOLD_S.
     BOOT kan ikke brukes ved omstart: BOOT + RST sender kortet til ROM-bootloaderen.
@@ -105,7 +105,7 @@ def idle_wait(button, screen, seconds, status_prefix=None):
                 time.sleep(0.05)
         if now >= next_tick:
             if status_prefix is None:
-                screen.show_age("%d s" % remaining)
+                screen.show_age("ny om %d s" % remaining)
             else:
                 screen.show_message("%s - %d" % (status_prefix, remaining))
             next_tick = now + 1

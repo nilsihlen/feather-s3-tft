@@ -85,7 +85,7 @@ driftsbildet fra Lovable.
   25.11: `temperatur: 9.02` i loggen og «9 °C» på skjermen. v0.2.6 endrer `app.py` (sone 1): kopiert til kortet over USB og
   Publisert 25.11 med `--allow-zone1` (Nils godtok), og raw-URL-en viser 0.2.6. IKKE sett: at et kort i lader henter 0.2.6 selv.
 - v0.2.7 (Nils-ønske 25.11): nederst til høyre står versjonen kort («v2.7») og sekundene som teller ned («42 s», uten «ny om»).
-  Endrer `app.py` og `screen.py`. Kopiert til kortet over USB, committet lokalt, IKKE publisert. Se på 25.11-bilder: `nedtelling`, `henter`.
+  Bare `screen.py` (sone 3): `show_age` fjerner «ny om » selv, så `app.py` er uendret og ingen sone 1 trengs over nett.
 - 100 % fukt bruker ett hakk mindre skrift og skjuler døgnendringen.
 - `tools/screenshot.py` bruker testtall når kortet ikke har nett, og kjøres på Mac med `.venv/bin/python` og porten
   `/dev/cu.usbmodem...`. Nye testbilder: `temperatur`, `fukt100`.

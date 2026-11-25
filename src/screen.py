@@ -289,7 +289,13 @@ class Screen:
         self._detail.anchored_position = (84 if online else 0, FOOTER_Y)
 
     def show_age(self, text):
-        """Rapportalderen nederst til høyre, kalt hvert sekund mellom hentingene."""
+        """Sekundene til neste henting nederst til høyre, kalt hvert sekund mellom hentingene.
+
+        Programmet sender «ny om 42 s». Versjonen står foran, så «ny om» er overflødig og
+        strippes her. Det holder app.py (sone 1) urørt, og teksten kan endres over nett.
+        """
+        if text.startswith("ny om "):
+            text = text[6:]
         self._put_status(text, GREEN)
 
     def start_ticker(self, text):

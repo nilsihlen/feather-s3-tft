@@ -98,7 +98,7 @@ SCENES = {
         "k.update(cellar_rh=100, cellar_rh_change=12.4, cellar_temp=-2.4, report_at='u')\n"
         "s.show(k, '42 s')\n"
     ),
-    "nedtelling": "s.show(d, '')\ns.show_age('42 s')\n",
+    "nedtelling": "s.show(d, '')\ns.show_age('ny om 42 s')\n",
     "henter": "s.show(d, '')\ns.show_age('henter')\n",
     "portalfeil": "s.show(d, '')\ns.show_message('portal 12 min - 42')\n",
     "feil": "f = dict(d)\nf.update(vebus_error=17)\ns.show(f, '3 min')\n",
