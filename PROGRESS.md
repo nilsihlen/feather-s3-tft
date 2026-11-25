@@ -1,6 +1,6 @@
 # PROGRESS
 
-Sist oppdatert: 2026-11-01. OTA er i drift på v0.2.4, se «OTA-status». Før kortet gis bort: se punktene i Plan.
+Sist oppdatert: 2026-11-25. Ny layout i v0.2.5, se «Visuell endring 25.11». OTA er i drift, se «OTA-status». Før kortet gis bort: se punktene i Plan.
 
 ## Status
 Kortet virker og er nesten klart til å gis bort. Faren eller sønnen til Nils skal kunne sette i
@@ -73,6 +73,20 @@ driftsbildet fra Lovable.
 - Kjente begrensninger: en hengende (ikke krasjende) app gir ingen omstart; en god versjon kan
   rulles tilbake hvis Lovable er nede i over 4 min rett etter oppdatering (publiser da nytt versjonsnummer).
   Sikkerheten er GitHub-kontoen: slå på 2FA. Zone 1 over nett krever `tools\publish.py --allow-zone1`.
+
+## Visuell endring 25.11 (v0.2.5)
+Ønske fra Nils: se fukt og temperatur i vinkjelleren først.
+- Øverst står nå VINKJELLER: fukt stort til venstre (grønn under 80 %, gul fra 80 %, rød over portalens grense)
+  med `+5 24 t` (døgnendring) ved siden av, og temperatur stort til høyre.
+- Flisene er SOL, LAST, SOC og bank (etikett LADER W, TAPPER W eller HVILE W). AGGR W er fjernet; AC-spenning
+  og frekvens står på bunnlinja mens aggregatet går. Kurven under det store feltet er SOC siste 24 t.
+- Temperaturen kommer bare fra portalen når rommålingen er under 20 min gammel, ellers vises `--`. Kortet holder
+  siste verdi til neste rapport. IKKE sett med ekte temperatur på skjermen: bildet «12 °C» bruker testtall.
+- 100 % fukt bruker ett hakk mindre skrift og skjuler døgnendringen.
+- `tools/screenshot.py` bruker testtall når kortet ikke har nett, og kjøres på Mac med `.venv/bin/python` og porten
+  `/dev/cu.usbmodem...`. Nye testbilder: `temperatur`, `fukt100`.
+- `captive.py` var 0 byte på kortet (årsak ukjent, datoen 2000-01-01 tyder på skriving fra kortet selv). Kopiert inn fra
+  `src\` 25.11 og testet. Sjekk at andre filer på kortet er like `src\` etter OTA-tester.
 
 ## Neste økt: start her
 Les denne seksjonen og «OTA-status». `docs/HANDOVER_20261101.md` er utdatert: fase 0 til 3 er kjørt, og

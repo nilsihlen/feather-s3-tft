@@ -42,13 +42,15 @@ så 24-timerskurven fra VRM-historikken ved oppstart, så den ikke starter tom.
 ## Kilder for tallene
 | På skjermen | Felt i `/api/live` |
 |---|---|
-| SOC | `energy.<enhet>.sources.victron.soc_pct` |
-| HVILE, LADER, TAPPER | `ovrige.batt_state` |
-| `~-378 W` | `pv_w` + `batt_v` × `aggregat.dc_a` − `sources.device.p_w`, som `bankEffekt()` i portalen. Anslag: små DC-laster er ikke med |
+| SOC % (flis) | `energy.<enhet>.sources.victron.soc_pct`. Gul under 40 %, rød under 20 %. Kurven over flisene er SOC siste 24 t |
+| HVILE W, LADER W, TAPPER W (etikett over bankflisen) | `ovrige.batt_state` |
+| Bankflisen, `-378` | `pv_w` + `batt_v` × `aggregat.dc_a` − `sources.device.p_w`, som `bankEffekt()` i portalen. Anslag: små DC-laster er ikke med |
 | `5% om ca 17 t` | Avstand til neste grense × 130 Wh per prosent / bankeffekten. Grensene er nødlading 5 %, aggregatstopp 90 % og ellers 100 % |
 | SOL W, LAST W | `pv_w`, `ovrige.ac_load_w` |
-| AGGR W | `aggregat.ac_in_w` når `ovrige.ac_source` er 2, ellers `AV` |
-| KJELLER % | `fukt.<enhet>.vinkjeller.doegntrend.til_rh_pct`. Rødt over `rh_grense_pct` |
+| Aggregatet | Ikke egen flis lenger. Bunnlinja viser `AC <volt>V <Hz>` når `ovrige.ac_source` er 2 |
+| VINKJELLER, stort tall øverst til venstre | `fukt.<enhet>.vinkjeller.doegntrend.til_rh_pct`. Grønn under 80 %, gul fra 80 %, rød over `rh_grense_pct` |
+| `+5 24 t` ved siden av fukten | `doegntrend.endring_pp`. Skjules ved 100 %, der det ikke er plass |
+| Temperatur øverst til høyre | `fukt.<enhet>.vinkjeller.kjeller.temp_c`. Portalen sender den bare når rommålingen er under 20 min gammel, ellers `--`. Kortet holder siste verdi til neste rapport |
 | Detaljlinjen | Operasjon som kjører eller teknisk rom, og startbatteriet. Med aggregat: AC inn |
 | Tid nederst til høyre | Alder på siste rapport, `now` − `last_report_at` |
 

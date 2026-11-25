@@ -76,6 +76,22 @@ class ParseTests(unittest.TestCase):
         self.assertEqual(data["start_v"], 12.7)
         self.assertEqual(data["target_pct"], 5)
 
+    def test_cellar_trend_and_temperature(self):
+        rooms = {DEVICE: {"vinkjeller": {
+            "kjeller": {"verste_rh_pct": 85.2, "temp_c": 11.6},
+            "doegntrend": {"til_rh_pct": 85.2, "endring_pp": 5.38},
+        }}}
+        data = portal.parse(live(fukt=rooms))
+        self.assertEqual(data["cellar_temp"], 11.6)
+        self.assertEqual(data["cellar_rh_change"], 5.38)
+
+    def test_cellar_temperature_missing_when_measurement_old(self):
+        rooms = {DEVICE: {"vinkjeller": {"kjeller": None, "doegntrend": {"til_rh_pct": 85.2}}}}
+        data = portal.parse(live(fukt=rooms))
+        self.assertIsNone(data["cellar_temp"])
+        self.assertIsNone(data["cellar_rh_change"])
+        self.assertEqual(data["cellar_rh"], 85.2)
+
     def test_bank_uses_multiplus_not_batt_w(self):
         self.assertAlmostEqual(portal.parse(live())["bank_w"], 53.3 * -7.3 - 6.5)
 

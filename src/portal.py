@@ -92,8 +92,13 @@ def _bank_source(sources):
     return {}
 
 
-def _humidity(rooms, room):
-    return _dict(_dict(rooms.get(room)).get("doegntrend")).get("til_rh_pct")
+def _humidity(rooms, room, key="til_rh_pct"):
+    return _dict(_dict(rooms.get(room)).get("doegntrend")).get(key)
+
+
+def _room_temp(rooms, room):
+    """Temperaturen er bare med mens rommålingen er under 20 min gammel."""
+    return _dict(_dict(rooms.get(room)).get("kjeller")).get("temp_c")
 
 
 def parse(live):
@@ -153,6 +158,8 @@ def parse(live):
         "target_pct": target,
         "hours": hours,
         "cellar_rh": _humidity(rooms, "vinkjeller"),
+        "cellar_rh_change": _humidity(rooms, "vinkjeller", "endring_pp"),
+        "cellar_temp": _room_temp(rooms, "vinkjeller"),
         "tech_rh": _humidity(rooms, "teknisk"),
         "rh_limit": live.get("rh_grense_pct"),
         "operation": OPERATIONS.get(operation, operation),

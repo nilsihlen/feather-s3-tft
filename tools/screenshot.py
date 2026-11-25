@@ -35,6 +35,27 @@ s = screen.Screen()
 s.activate()
 s._history = [min(100, 40 + abs(120 - i) // 3) for i in range(239)]
 s.add_soc(d['soc'])
+# Versjonsteksten fra activate() skjuler bunnlinja til den har rullet forbi.
+s._ticker.hidden = True
+s._detail.hidden = False
+s._status.hidden = False
+"""
+
+# Faste tall når kortet ikke når Lovable, så driftsbildene kan tegnes uten nett.
+OFFLINE = """
+d = {'now_epoch': 0, 'age_s': 95, 'stale': False, 'report_at': 'test', 'soc': 72,
+ 'batt_state': 2, 'pv_w': 0, 'load_w': 310, 'generator_on': False, 'ac_in_v': None,
+ 'ac_in_hz': None, 'ac_in_w': None, 'start_v': 12.8, 'vebus_error': 0,
+ 'bank_w': -335.0, 'target_pct': 20, 'hours': 11.6, 'cellar_rh': 64, 'tech_rh': 48,
+ 'rh_limit': 87, 'operation': None, 'cellar_rh_change': 5.4, 'cellar_temp': 11.6}
+s = screen.Screen()
+s.activate()
+s._history = [min(100, 40 + abs(120 - i) // 3) for i in range(239)]
+s.add_soc(d['soc'])
+# Versjonsteksten fra activate() skjuler bunnlinja til den har rullet forbi.
+s._ticker.hidden = True
+s._detail.hidden = False
+s._status.hidden = False
 """
 
 DUMP = """
@@ -60,8 +81,18 @@ SCENES = {
     ),
     "fukt": (
         "f = dict(d)\n"
-        "f.update(cellar_rh=91, operation='Avfukting', batt_state=0, bank_w=12.0, hours=None)\n"
+        "f.update(cellar_rh=91, cellar_rh_change=-3.2, operation='Avfukting', batt_state=0, bank_w=12.0, hours=None)\n"
         "s.show(f, '4 min')\n"
+    ),
+    "temperatur": (
+        "k = dict(d)\n"
+        "k.update(cellar_rh=72, cellar_rh_change=-1.2, cellar_temp=11.6, report_at='t')\n"
+        "s.show(k, '2 min')\n"
+    ),
+    "fukt100": (
+        "k = dict(d)\n"
+        "k.update(cellar_rh=100, cellar_rh_change=12.4, cellar_temp=-2.4, report_at='u')\n"
+        "s.show(k, 'ny om 42 s')\n"
     ),
     "feil": "f = dict(d)\nf.update(vebus_error=17)\ns.show(f, '3 min')\n",
     "gammel": "s.show(d, '')\ns.show_stale('rapport 3 t')\n",
@@ -161,10 +192,11 @@ def main():
         run(port, SETUP + "print('KLAR')\n")
         text = read_until(port, b"KLAR\r\n", 40)
         if "Error" in text:
-            print("uten nett: bare oppsettbildene er tatt")
-        else:
-            for name, scene in SCENES.items():
-                capture(port, out, name, scene)
+            print("uten nett: driftsbildene tegnes med testdata")
+            run(port, IMPORTS + OFFLINE + "print('KLAR')\n")
+            read_until(port, b"KLAR\r\n", 20)
+        for name, scene in SCENES.items():
+            capture(port, out, name, scene)
 
     port.write(b"\x04")
     time.sleep(0.5)
