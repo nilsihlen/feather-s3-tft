@@ -1,11 +1,31 @@
 {
- "version": "0.2.5",
+ "version": "0.2.6",
  "base": "https://raw.githubusercontent.com/nilsihlen/feather-s3-tft/main/src/",
  "files": {
+  "app.py": {
+   "zone": 1,
+   "sha256": "f7a5854a9cf017460ad642f6aed8e554e33a8d22336357d04e34fdd0bb08890f",
+   "size": 12870
+  },
+  "captive.py": {
+   "zone": 1,
+   "sha256": "d1ecb100bb7a480c5352c6dccf778b4148036377f18d3f14f83d186577d0a95f",
+   "size": 1272
+  },
+  "guard.py": {
+   "zone": 1,
+   "sha256": "9187b1b39e8517ea8b99947a4b22adcf4cf4e03030b1c410d9b970f57c7641dd",
+   "size": 1709
+  },
+  "netconfig.py": {
+   "zone": 1,
+   "sha256": "8db8c3a39b6c0529aa938cb55c451800a7c1f214af0f9e372a9d960894d1c7d7",
+   "size": 3208
+  },
   "portal.py": {
    "zone": 2,
-   "sha256": "061a4322c3ef00cba0e084b9220674850c5fab475b398b0f145bb95244a3c518",
-   "size": 5541
+   "sha256": "73a372ca51825ad80e6954cf342472c5aa9ea9ee754ac1fb0dd0f58bc4508c69",
+   "size": 6587
   },
   "portal_root.pem": {
    "zone": 2,
@@ -24,13 +44,19 @@
   },
   "version.py": {
    "zone": 3,
-   "sha256": "01032619b29bac9b5d75fd8f55a3423b6a690b4d6e1875c970dd9f9be0f44091",
+   "sha256": "38df74395959ee2b25dc93039a02075de2ea81b8a247f83fb42f7f72e1d7de61",
    "size": 97
   },
   "vrm.py": {
    "zone": 2,
    "sha256": "6e75658a5b94e8289d176e9072b16390aac62a338e4b0f1de62e3a602339d2cb",
    "size": 2887
+  },
+  "wifisetup.py": {
+   "zone": 1,
+   "sha256": "e3a0757e7e39342f5b15c12dd78841e21494e95998d9d542494b0b11d4eb7681",
+   "size": 8963
   }
- }
+ },
+ "allow_zone1": true
 }
