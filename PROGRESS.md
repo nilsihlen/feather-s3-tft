@@ -86,6 +86,9 @@ driftsbildet fra Lovable.
   Publisert 25.11 med `--allow-zone1` (Nils godtok), og raw-URL-en viser 0.2.6. IKKE sett: at et kort i lader henter 0.2.6 selv.
 - v0.2.7 (Nils-ønske 25.11): nederst til høyre står versjonen kort («v2.7») og sekundene som teller ned («42 s», uten «ny om»).
   Bare `screen.py` (sone 3): `show_age` fjerner «ny om » selv, så `app.py` er uendret og ingen sone 1 trengs over nett.
+  Publisert 25.11 (sone 3, uten sone 1). OTA-test i lader, meldt av Nils: kortet gikk fra 0.2.6 til 0.2.7 av seg selv og viste
+  «v2.7  42 s». Lest av Nils på skjermen; `ota/state.json` er ikke sjekket. Dette er første ekte nettoppdatering i lader
+  (så vidt kjent, ikke tilbakerulling), så sone 2 og 3 over nett er bevist. Sone 1 over nett er fortsatt ikke prøvd. v0.2.6 (sone 1) er publisert, men ikke sett hentet i lader.
 - 100 % fukt bruker ett hakk mindre skrift og skjuler døgnendringen.
 - `tools/screenshot.py` bruker testtall når kortet ikke har nett, og kjøres på Mac med `.venv/bin/python` og porten
   `/dev/cu.usbmodem...`. Nye testbilder: `temperatur`, `fukt100`.
